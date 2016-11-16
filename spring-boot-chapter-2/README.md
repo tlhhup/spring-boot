@@ -32,7 +32,8 @@
 			@Autowired
 			private Environment environment;
 2. 采用**java配置类来配置spring容器**(将原来采用xml文件的方式换成java配置)
-	1. 定义bean：使用@Bean注解可以定义spring容器中bean，但该方法必须加在方法上，并且将以方法的名称作为该bean的名称
+	1. 通过在java类身上添加@Configuration注解标识该类为spring的配置类
+	2. 定义bean：使用@Bean注解可以定义spring容器中bean，但该方法必须加在方法上，并且将以方法的名称作为该bean的名称
 
 			@Bean//定义在方法上，将使用方法的名称作为bean的名称
 			public static PropertySourcesPlaceholderConfigurer placeholderConfigurer(){
