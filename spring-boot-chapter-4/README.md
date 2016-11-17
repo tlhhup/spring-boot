@@ -5,7 +5,7 @@ spring boot它使用“习惯优于配置”的理念让你的项目快速运行
 1. 核心功能
 	1. 独立运行的spring项目，可以以jar包的形式独立运行
 	2. 内嵌servlet容器
-	3. 提供starter简化maven配置
+	3. 提供starter简化maven配置，通过指定的starter来自动引入依赖
 	4. 自动配置spring
 	5. 准生产的应用监控：提供基于http、ssh、telnet对运行时的项目进行监控
 	6. 无代码生成和xml配置
@@ -74,5 +74,17 @@ spring boot它使用“习惯优于配置”的理念让你的项目快速运行
 				}
 			1. Spring Boot会**自动扫描**使用了@SpringBootApplication注解类所在的同级包以及子包中的Bean(若为JPA项目还可以扫描标注@Entity的实体类)
 			2. 通过exclude属性可以指定排除扫描的Bean
+	3. 全局配置文件：Spring Boot的配置文件在src/main/resources目录(application.properties)或者类路径的/config(application.yaml)下，支持properties和yaml类型的配置文件
+		1. properties文件配置
+		
+				# 修改端口号
+				server.port=8090
+				# 修改上下文路径	
+				server.contextPath=/hellBoot
+	3. 附加注解
+		1. @ImportResource：可以引入外部的xml配置文件
+		2. @ConfigurationProperties：可以将properties属性和一个Bean的属性关联(将属性文件中的数据绑定到Bean的属性身上)
+	3. 运行原理(自动配置)：基于Condition条件的判断
+		1. 其Sprint Boot的核心配置在spring-boot-autoconfigure-1.3.5.RELEASE.jar包中的/META-INF/spring.factories文件，定义了所有的自动配置
 
 					
