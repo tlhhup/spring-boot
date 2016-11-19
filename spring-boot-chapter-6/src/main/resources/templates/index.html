@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<title>Insert title here</title>
+<link th:href="@{bootstrap/css/bootstrap-theme.min.css}" rel="stylesheet"/>
+<link th:href="@{bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
+<script type="text/javascript" th:src="@{jquery-1.11.3.min.js}"></script>
+<script type="text/javascript" th:src="@{bootstrap/js/bootstrap.min.js}"></script>
+</head>
+<body>
+	<div th:if="${not #lists.isEmpty(users)}">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">列表</h3>
+			</div>
+			<div class="panel-body">
+				<ul class="list-group">
+					<li class="list-group-item" th:each="user:${users}">
+						<span th:text="${user.userName}"></span>
+						<span th:text="${user.address}"></span>
+						<span th:text="${user.age}"></span>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
