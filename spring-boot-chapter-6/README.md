@@ -146,5 +146,52 @@ spring boot通过org.springframework.boot.autoconfigure.thymeleaf包对thymeleaf
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-starter-undertow</artifactId>
 				</dependency>
-4. 配置SSL
+4. **配置SSL**
+	1. SSL(Secure Sockets Layer，安全套接层)是为通信提供安全及数据完整性的一种安全协议，SSL在网络传输层对网络连接进行加密。SSL协议位于TCP/IP协议与各种应用层协议之间，为数据通讯提供安全支持。SSL协议可分为两层： SSL记录协议（SSL Record Protocol）：它建立在可靠的传输协议（如TCP）之上，为高层协议提供数据封装、压缩、加密等基本功能的支持。 SSL握手协议（SSL Handshake Protocol）：它建立在SSL记录协议之上，用于在实际的数据传输开始前，通讯双方进行身份认证、协商加密算法、交换加密密钥等
+	2. 使用
+		1. 配置安装证书
+			1. SSL认证中心获取
+			2. 自授权证书(使用JDK处理)-->针对tomcat容器
+				1. 在jdk的bin目录使用keytool工具生成授权证书
+				
+						keytool -genkey -alias tomcat
+		2. 将用户目录生成的.keystore文件复制到项目根目录
+		3. 配置ssl
+
+				server.ssl.key-alias=tomcat		#servlet容器
+				server.ssl.key-password=111111	#密钥
+				server.ssl.key-store=.keystore	#证书地址
+				server.ssl.key-store-type=JKS   #类型
+		4. http转向https:需要通过配置TomcatEmbeddedServletContainerFactory，并添加connector来实现，在Spring Boot的入口类中添加以下代码
+
+				@Bean
+				public TomcatEmbeddedServletContainerFactory servletContainerFactory(){
+					TomcatEmbeddedServletContainerFactory factory=new TomcatEmbeddedServletContainerFactory(){
+						
+						@Override
+						protected void postProcessContext(Context context) {
+							SecurityConstraint constraint=new SecurityConstraint();
+							constraint.setUserConstraint("CONFIDENTIAL");
+							SecurityCollection collection=new SecurityCollection();
+							collection.addPattern("/*");
+							constraint.addCollection(collection);
+							context.addConstraint(constraint);
+						}
+						
+					};
+					factory.addAdditionalTomcatConnectors(connector());
+					return factory;
+				}
 			
+				@Bean
+				public Connector connector() {
+					//设置http协议时的信息
+					Connector connector=new Connector("org.apache.coyote.http11.Http11NioProtocol");
+					connector.setScheme("http");
+					//使用http联系是使用的端口
+					connector.setPort(8080);
+					connector.setSecure(false);
+					//重定向到https使用的端口及此时server.port的值
+					connector.setRedirectPort(8089);
+					return connector;
+				}
