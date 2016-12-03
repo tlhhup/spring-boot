@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<title>Spring Boot+webSocket+广播式</title>
+<script type="text/javascript" th:src="@{jquery-1.11.3.min.js}"></script>
+<script type="text/javascript" th:src="@{sockjs.min.js}"></script>
+<script type="text/javascript" th:src="@{stomp.js}"></script>
+<script type="text/javascript">
+	var stompClient=null;
+	
+	function setConnect(flag){
+		document.getElementById("connect").disabled=flag;
+		document.getElementById("disConnect").disabled=!flag;
+		document.getElementById("response").style.visibility=flag?'visible':'hidden';
+		$("#response").html();
+	}
+
+	function disconnect(){
+		if(stompClient!=null){
+			stompClient.disconnect();
+		}
+		setConnect(false);
+		console.info("关闭链接");
+	}
+	
+	//获取链接
+	function connect(){
+		var socket=new SockJS("/chapter6/endPoints");//注册结束标识
+		stompClient=Stomp.over(socket);
+		stompClient.connect({},function(frame){//基于帧的数据
+			setConnect(true);
+			console.info("connected:"+frame);
+			//订阅消息
+			stompClient.subscribe('/topic/boardcast',function(response){
+				console.info("返回数据");
+				showResponse(JSON.parse(response.body).name);
+			});
+		});
+	}
+	
+	function sendName(){
+		var name=$("#name").val();
+		stompClient.send("/welcome",{},JSON.stringify({'name':name}));
+	}
+	
+	function showResponse(data){
+		var response=$("#response");
+		response.html(data);
+	}
+	
+</script>
+</head>
+<body onload="disconnect()">
+	<noscript>
+		<h2 style="color: #ff0000">貌似你的浏览器不支持websocket</h2>
+	</noscript>
+	<div>
+		<div>
+			<input type="button" value="链接" id="connect" onclick="connect()"/>
+			<input type="button" value="断开" id="disConnect" onclick="disconnect()"/>
+		</div>
+		<div>
+			<label>请输入你的名字</label><input type="text" id="name"/>
+			<input type="button" onclick="sendName()" value="发送"/>
+			<p id="response"></p>
+		</div>
+	</div>
+</body>
+</html>

@@ -54,6 +54,11 @@ Thymeleaf是一个Java库。它是XML、XHTML、HTML5等格式的模板引擎，
 				<script th:inline="javascript">
 					var value=[[${user.name}]]
 				</script>
+3. 注意事项
+	1. 界面上如果具有空标记则必须使用"/"结束
+
+			<input type="text" id="name"/>	正确
+			<input type="text" id="name">	错误
 ###2.Thymeleaf整合springmvc
 
 	@Configuration
@@ -86,7 +91,7 @@ Thymeleaf是一个Java库。它是XML、XHTML、HTML5等格式的模板引擎，
 		
 	}
 ###3.Thymeleaf整合spring boot
-spring boot通过org.springframework.boot.autoconfigure.thymeleaf包对thymeleaf进行自动配置，ThymeleafProperties用来配置Thymeleaf
+spring boot通过org.springframework.boot.autoconfigure.thymeleaf包**对thymeleaf进行自动配置**，ThymeleafProperties用来配置Thymeleaf
 
 	//设置默认编码
 	private static final Charset DEFAULT_ENCODING = Charset.forName("UTF-8");
@@ -107,6 +112,10 @@ spring boot通过org.springframework.boot.autoconfigure.thymeleaf包对thymeleaf
 				{
 				"classpath:/META-INF/resources/", "classpath:/resources/",
 				"classpath:/static/", "classpath:/public/" };
+		2. 可以在application.properties文件中通过前缀为spring.mvc的属性进行springmvc的配置修改
+	2. **接管Spring Boot对spring mvc的自动配置**
+		1. 通过为添加@configuration注解的配置类添加@EnableWebMvc注解标识为该配置为spring mvc的配置信息
+		2. 通过继承WebMvcConfigurerAdapter的配置类(添加了@configuration注解)表示该配置为spring mvc的配置信息，则可以不同添加@EnableWebMvc注解
 3. 注册Filter、Servlet、Listener
 	1. 通过直接定义Filter、Servlet、Listener对应的bean进行注册
 	2. 通过ServletRegistrationBean、FilterRegistrationBean、ListenerRegistrationBean进行注册
@@ -170,8 +179,11 @@ spring boot通过org.springframework.boot.autoconfigure.thymeleaf包对thymeleaf
 						
 						@Override
 						protected void postProcessContext(Context context) {
+							//设置安全认证方式
 							SecurityConstraint constraint=new SecurityConstraint();
+							//访问受保护的资源时使用任何传输层保护
 							constraint.setUserConstraint("CONFIDENTIAL");
+							//创建受保护的资源
 							SecurityCollection collection=new SecurityCollection();
 							collection.addPattern("/*");
 							constraint.addCollection(collection);
@@ -195,3 +207,19 @@ spring boot通过org.springframework.boot.autoconfigure.thymeleaf包对thymeleaf
 					connector.setRedirectPort(8089);
 					return connector;
 				}
+5. 设置favicon:将自己的favicon.icon文件放置在以下目录任意即可
+
+		{
+			"classpath:/META-INF/resources/", "classpath:/resources/",
+			"classpath:/static/", "classpath:/public/" };
+6. **WebSocket**
+
+    WebSocket protocol 是HTML5一种新的协议。它实现了浏览器与服务器全双工通信(full-duplex)。一开始的握手需要借助HTTP请求完成。
+
+     WebScoket是通过一个socket来实现双工异步通信的能力的。但是直接使用WebSocket(获取SockJs：WebScoket协议的模拟，增加了当浏览器不支持WebSocket的时候的兼容支持)协议开发程序显得比较繁琐，但是使用其子协议STOMP比较方便，它是一个更高级别的协议，STOMP协议是一个基于帧的格式来定义消息，与HTTP的request和response类似(具有类似于@RequestMapping和@MessageMapping注解)
+
+	1. 集成
+		1. 引入spring-boot-start-websocket的支持 
+		2. spring boot的自动配置：通过springboot的autoconfigure.websocket包中的WebSocketAutoConfiguration对实现自动配置
+	2.  使用
+		1.  广播式：客户端对服务器端消息进行订阅，服务端有消息就直接发送到订阅的客户端中

@@ -1,4 +1,4 @@
-package com.tlh.spring.config;
+package com.tlh.spring;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.context.annotation.Bean;
 
-@SpringBootApplication(scanBasePackages={"com.tlh.spring.**"})
+@SpringBootApplication
 public class Chapter6Application {
 
 	public static void main(String[] args){
@@ -22,8 +22,11 @@ public class Chapter6Application {
 			
 			@Override
 			protected void postProcessContext(Context context) {
+				//设置认证方式
 				SecurityConstraint constraint=new SecurityConstraint();
+				//访问相关资源时使用任何传输层保护
 				constraint.setUserConstraint("CONFIDENTIAL");
+				//设置保护的资源
 				SecurityCollection collection=new SecurityCollection();
 				collection.addPattern("/*");
 				constraint.addCollection(collection);
@@ -31,6 +34,7 @@ public class Chapter6Application {
 			}
 			
 		};
+		//实现http-->https协议
 		factory.addAdditionalTomcatConnectors(connector());
 		return factory;
 	}
