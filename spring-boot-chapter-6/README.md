@@ -191,6 +191,7 @@ spring boot通过org.springframework.boot.autoconfigure.thymeleaf包**对thymele
 						}
 						
 					};
+					//实现http-->https协议的转换
 					factory.addAdditionalTomcatConnectors(connector());
 					return factory;
 				}
@@ -223,3 +224,15 @@ spring boot通过org.springframework.boot.autoconfigure.thymeleaf包**对thymele
 		2. spring boot的自动配置：通过springboot的autoconfigure.websocket包中的WebSocketAutoConfiguration对实现自动配置
 	2.  使用
 		1.  广播式：客户端对服务器端消息进行订阅，服务端有消息就直接发送到订阅的客户端中
+			1. 配置WebSocket,在配置类上添加@EnableWebSocketMessageBroker注解并继承AbstractWebSocketMessageBrokerConfigurer类对endpoint进行注册和MessageBroker进行配置
+			2. 定义消息发送器，通过使用@SendTo注解定义订阅消息的订阅号
+
+					@SendTo("/topic/boardcast")//订阅地址：服务器--->客户端
+					@MessageMapping("/welcome")//请求的地址：客户端-->服务器
+					public WebSocketMessage message(WebSocketMessage message){
+						WebSocketMessage result=new WebSocketMessage();
+						result.setName("Welcome，"+message.getName());
+						
+						return result;
+					}
+			3. 客户端通过STOMP链接服务端或发送消息
