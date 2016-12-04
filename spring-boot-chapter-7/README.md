@@ -12,3 +12,9 @@ spring boot数据访问支持
 4. 对spring data jpa的自动配置
 	1. spring boot对spring data jpa的自动配置放置在org.springframework.boot.autoconfigure.data.jpa下，spring boot自动开启了对spring data jpa的支持，即无须再配置类显示声明@EnableJpaRepositories
 	2. 在spring boot下使用spring data jpa只需添加spring-boot-starter-data-jpa的依赖，并配置数据源、实体类和数据访问层即可
+3. JPA相关注解说明
+	1. @Entity：指明该实体类和数据库表的映射关系
+	2. @ID：指明该属性映射数据库表的主键
+	3. @GeneratedValue：默认使用注解生成方式为自增
+	4. @Colum：表示普通属性，不添加该注解时hibernate会自动根据属性名生成数据表的字段名，多字母采用"_"隔开，如：属性为userName会自动映射成user_name。表名的映射规则也是如此
+	5. @Table：实体类映射表名
