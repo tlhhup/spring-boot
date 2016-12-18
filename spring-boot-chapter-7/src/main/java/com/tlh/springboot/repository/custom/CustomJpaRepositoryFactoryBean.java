@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.core.RepositoryInformation;
+import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 
 public class CustomJpaRepositoryFactoryBean<T extends JpaRepository<S, ID>, S, ID extends Serializable>
@@ -32,6 +33,11 @@ public class CustomJpaRepositoryFactoryBean<T extends JpaRepository<S, ID>, S, I
 				RepositoryInformation information, EntityManager entityManager) {
 			//将自定义的Repository对象注入到Factory对象中
 			return new CostomJpaRepositoryImpl<>(information.getDomainType(), entityManager);
+		}
+		
+		@Override
+		protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
+			return CostomJpaRepositoryImpl.class;
 		}
 		
 	}
