@@ -54,7 +54,7 @@
 		4. 开启自定义支持使用@EnableJpaRepositioning注解来指定自定义的RepositoryFactoryBean对象
 ##
 ###Spring Data Rest
-1. Spring Data JPA是基于Spring Data的repository之上，可以将repository自动输出为REST资源(REST是设计风格而不是标准)。
+1. Spring Data JPA是基于Spring Data的repository之上，可以将repository自动输出为REST资源(REST是设计风格而不是标准)，此时**REST的资源不能通过浏览器直接访问**。
 2. Spring MVC中配置实用Spring Data Rest
 
 	Spring Data REST的配置定义在RepositoryRestMvcConfiguration配置类中已经配置好了，使用时只需要继承此类或者通过@import注解导入该类的配置即可
@@ -68,6 +68,85 @@
 		public class MyRepositoryRestMvcConfiguration{
 
 		}
-3. 在Spring Boot中集成Spring Data REST
+3. 在Spring Boot中集成Spring Data REST(自动配置)
 
 	在Spring Boot中已经通过RepositoryRestMvcAutoConfiguration进行了自动的配置，如需修改只需要在application.properties文件通过前缀为spring.data.rest的属性进行配置即可。而是用也只需引入spring-boot-starter-data-rest依赖即可。
+##
+###声明式事务
+Spring的事务机制提供了PlatformTransactionManger接口，不同的数据库访问计算的事务使用不同的接口实现。
+
+![](http://i.imgur.com/Aq5Yaej.jpg)
+
+1. @Transaction注解，加在类上表示该类中所有的public的方法都将在事务中运行 
+##
+###数据缓存
+1. Spring缓存支持
+
+	Spring定义了CacheManager和Cache接口来统一处理缓存技术，CacheManger是Spring提供的各种缓存技术的抽象接口，Cache接口处理各种缓存操作。
+	1. Spring支持的CacheManager
+
+		<table>
+			<tr>
+				<td>CacheManger</td>
+				<td>描述</td>
+			</tr>
+			<tr>
+				<td>SimpleCacheManager</td>
+				<td>使用简单的Collection来存储缓存，主要用来测试</td>
+			</tr>
+			<tr>
+				<td>ConcurrentMapCacheManager</td>
+				<td>使用ConcurrentMap来存储缓存</td>
+			</tr>
+			<tr>
+				<td>NoOpCacheManager</td>
+				<td>仅测试用途，不会实际缓存技术</td>
+			</tr>
+			<tr>
+				<td>EhCacheCacheManager</td>
+				<td>使用EhCache作为缓存技术</td>
+			</tr>
+			<tr>
+				<td>GuavaCacheManager</td>
+				<td>使用Google Guava的GuavaCache作为缓存技术</td>
+			</tr>
+			<tr>
+				<td>HazelcastCacheManager</td>
+				<td>使用Hazelcast作为缓存技术</td>
+			</tr>
+			<tr>
+				<td>JCacheCacheManager</td>
+				<td>使用JCache(JSR-107)标准的实现作为缓存技术，如Apache Commons JCS</td>
+			</tr>
+			<tr>
+				<td>RedisCacheManager</td>
+				<td>使用Redis作为缓存技术</td>
+			</tr>
+		</table>
+	2. 使用
+		1. 在Spring中注册对应的CacheManager对象Bean，及相应的配置文件
+
+				@Bean
+				public EhCacheCacheManager cacheManager(CacheManager ehCacheCacheManager) {
+					return new EhCacheCacheManager(ehCacheCacheManager);
+				}
+		2. 声明式缓存注解
+			1. @Cacheable：在方法执行前Spring先查看缓存中是否有数据，如果有数据，则直接返回缓存数据；若没有数据，调用方法并将方法的返回值放进缓存
+			2. @CachePut：无论怎样，都会将方法的返回值放入缓存中。其属性和@Cacheable一致
+			3. @CacheEvict：将一条或多条数据从缓存中删除
+			4. @Caching：可以通过@Caching注解组合多个注解策略在一个方法上
+		5. 开启声明式缓存支持：在spring的配置类添加@EnableCaching注解即可
+
+				@Configuration
+				@EnableCaching
+				public class MyConfig{
+				
+				}
+		
+2. Sprint Boot
+
+	在spring中使用缓存技术的关键是配置CacheManager，而Spring Boot已经自动配置了多个CacheManager。其自动配置主要通过autoconfigure.cache包来实现，通过在application.properties文件中的属性前缀为spring.cache的属性来配置缓存信息。
+	1. 在不做任何额外配置的情况下，默认使用SimpleCacheConfiguration，即使用ConcurrentMapCacheManager来处理缓存
+	2. 使用
+		1. 导入相关缓存技术的依赖包，并映入相应的配置文件
+		2. 在Sprint Boot的配置类添加@EnableCaching注解来开启缓存支持
