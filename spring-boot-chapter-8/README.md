@@ -31,7 +31,7 @@ Spring Security是专门针对基于Spring项目的安全框架，充分利用�
 				3. anyRequest：匹配所有的请求
 			2. 请求资源相应的安全处理策略
 
-				
+				![](http://i.imgur.com/r27RQDl.jpg)
 		4. 定义登录行为：及配置登录、退出请求的处理策略
 			
 			通过重写WebSecurityConfigureAdapter的configure(HttpSecurity http)方法进行配置

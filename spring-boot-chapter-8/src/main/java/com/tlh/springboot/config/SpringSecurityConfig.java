@@ -6,6 +6,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.tlh.springboot.service.impl.SysUserServiceImpl;
 
@@ -15,6 +17,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	UserDetailsService customUserDetailsService() {
 		return new SysUserServiceImpl();
+	}
+	
+	@Bean
+	PasswordEncoder passwordEncoder(){
+		return new BCryptPasswordEncoder();
 	}
 	
 	//配置用户认证信息
@@ -29,7 +36,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 			.anyRequest().authenticated()//所有的请求都必须先授权
 			.and()//
 			.formLogin()//登录
-				.loginPage("/login")//登录页面
+				.loginPage("/login")//登录页面,定义必须为post请求
 				.failureUrl("/login?error")//失败的地址
 				.permitAll()//用户任意访问
 			.and()//
