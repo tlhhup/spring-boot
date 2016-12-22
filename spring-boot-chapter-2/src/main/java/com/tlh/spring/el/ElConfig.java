@@ -34,7 +34,7 @@ public class ElConfig {
 	private String osName;
 	
 	//注入表达式的结果
-	@Value("#{T(java.util.Math).random()*100.0}")
+	@Value("#{T(java.lang.Math).random()*100.0}")
 	private double randomNumber;
 	
 	//注入其他bean的属性

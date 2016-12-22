@@ -13,7 +13,7 @@
 			private String osName;
 	3. 注入表达式的运算结果
 
-			@Value("#{T(java.util.Math).random()*100.0}")
+			@Value("#{T(java.lang.Math).random()*100.0}")
 			private double randomNumber;
 	4. 注入其他bean的属性
 
@@ -39,6 +39,7 @@
 			public static PropertySourcesPlaceholderConfigurer placeholderConfigurer(){
 				return new PropertySourcesPlaceholderConfigurer();
 			}
+	3. @PropertySource：分离配置文件，该注解**必须**和PropertySourcesPlaceholderConfigurerBean联合一起使用
 	2. 使用AnnotationConfigApplicationContext来实例化spring容器
 
 			AnnotationConfigApplicationContext act =new AnnotationConfigApplicationContext();
@@ -58,10 +59,15 @@
 		4. 条件注解：通过使用@Conditional注解可以根据满足一个特定条件的时候创建特定的bean
 			1. 条件必须实现Condition接口
 		2. **Enable注解**
-			1. @EnableAspectJAutoProxy：开启对AspectJ自动代理的支持
-			2. @EnableAsync：开启对异步任务的支持
-			3. @EnableScheduling：开启对调度的支持
-			4. @EnableCaching：开启注解式缓存
-			5. @EnableWebMvc：开启spring mvc的配置支持
-			6. @EnableJpaRepositories：开启对spring data Jpa repository的支持
-			7. @EnableTransactionManagement：开启注解式事务的支持
+			1. 常用的Enable注解
+				1. @EnableAspectJAutoProxy：开启对AspectJ自动代理的支持
+				2. @EnableAsync：开启对异步任务的支持
+				3. @EnableScheduling：开启对调度的支持
+				4. @EnableCaching：开启注解式缓存
+				5. @EnableWebMvc：开启spring mvc的配置支持
+				6. @EnableJpaRepositories：开启对spring data Jpa repository的支持
+				7. @EnableTransactionManagement：开启注解式事务的支持
+			2. Enable注解的原理：通过查看@Enable**注解的源码，发现所有的注解都使用了@Import注解，该注解是用来导入配置类的，意味着这些自动开启的实现其实是导入了一些自动配置的Bean。导入的配置方式分为三种类型
+				1. 直接导入配置类
+				2. 依据条件选择配置类(条件选择类为实现了ImportSelector接口的类)
+				3. 动态注入Bean(其实现了ImportBeanDefinitionRegistrar接口)
