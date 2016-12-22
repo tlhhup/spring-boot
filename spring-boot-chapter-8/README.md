@@ -21,6 +21,21 @@ Spring Security是专门针对基于Spring项目的安全框架，充分利用�
 				1. 通过实现UserDetailsService接口来提供用户的数据源
 				2. 配置自定义的UserDetailsService的Bean对象
 				2. 通过AuthenticationManagerBuilder的userDetailsService方法注入自定义的用户数据源
+			3. **设置密码加密策略**
+				1. 在Spring Security的配置类中定义passwordEncoder的bean对象
+
+						@Bean
+						PasswordEncoder passwordEncoder(){
+							return new BCryptPasswordEncoder();
+						}
+				2. 通过AuthenticationManagerBuilder的userDetailsService方法注入自定义的用户数据源,并注入定义的passwordEncoder对象
+
+						//配置用户认证信息
+						@Override
+						protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+							//设置自定义用户数据源及加密方式
+							auth.userDetailsService(customUserDetailsService()).passwordEncoder(passwordEncoder());
+						}
 		3. 配置授权信息：Spring Security中通过**角色来确认用户的具有的权限**，定义访问何种资源应该如何来处理
 
 			通过重写WebSecurityConfigureAdapter的configure(HttpSecurity http)方法进行配置
