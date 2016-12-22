@@ -27,7 +27,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 	//配置用户认证信息
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(customUserDetailsService());
+		//设置自定义用户数据源及加密方式
+		auth.userDetailsService(customUserDetailsService()).passwordEncoder(passwordEncoder());
 	}
 	
 	@Override
