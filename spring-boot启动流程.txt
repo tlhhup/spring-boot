@@ -1,0 +1,68 @@
+1.启动SpringApplication的run方法
+	public static ConfigurableApplicationContext run(Object[] sources, String[] args) {
+		return new SpringApplication(sources).run(args);//创建SpringApplication对象，并调用run方法
+	}
+1.创建SpringApplication对象
+	public SpringApplication(Object... sources) {
+		initialize(sources);//初始化资源
+	}
+
+	private void initialize(Object[] sources) {
+		if (sources != null && sources.length > 0) {
+			this.sources.addAll(Arrays.asList(sources));
+		}
+		//检测是否是web环境
+		this.webEnvironment = deduceWebEnvironment();
+		//加载jar包中所有的META-INF/spring.factories文件，并创建实例对象
+		/*
+		 加载的资源
+		spring-boot-1.4.2.RELEASE.jar!/META-INF/spring.factories
+		spring-boot-autoconfigure-1.4.2.RELEASE.jar!/META-INF/spring.factories
+		spring-beans-4.3.4.RELEASE.jar!/META-INF/spring.factories
+		*/
+		setInitializers((Collection) getSpringFactoriesInstances(
+				ApplicationContextInitializer.class));
+		//设置监听器
+		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+		//推断主类
+		this.mainApplicationClass = deduceMainApplicationClass();
+	}
+2. 调用SpringApplication对象run方法
+	public ConfigurableApplicationContext run(String... args) {
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+		ConfigurableApplicationContext context = null;
+		FailureAnalyzers analyzers = null;
+		configureHeadlessProperty();
+		SpringApplicationRunListeners listeners = getRunListeners(args);
+		listeners.started();
+		try {
+			ApplicationArguments applicationArguments = new DefaultApplicationArguments(
+					args);
+			ConfigurableEnvironment environment = prepareEnvironment(listeners,
+					applicationArguments);
+			//打印Banner
+			Banner printedBanner = printBanner(environment);
+			//该方法将通过所有的环境创建不同的Application对象
+			context = createApplicationContext();
+			analyzers = new FailureAnalyzers(context);
+			//准备工作：设置初始化及加载资源
+			prepareContext(context, environment, listeners, applicationArguments,
+					printedBanner);
+			//刷新上下文启动spring容器
+			refreshContext(context);
+			afterRefresh(context, applicationArguments);
+			listeners.finished(context, null);
+			stopWatch.stop();
+			//开启日志
+			if (this.logStartupInfo) {
+				new StartupInfoLogger(this.mainApplicationClass)
+						.logStarted(getApplicationLog(), stopWatch);
+			}
+			return context;
+		}
+		catch (Throwable ex) {
+			handleRunFailure(context, listeners, analyzers, ex);
+			throw new IllegalStateException(ex);
+		}
+	}
