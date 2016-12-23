@@ -54,6 +54,44 @@
 			3. 如果需要制定一执行器则配置类可以实现AsyncConfigurer接口去自定义异步的执行器和异常的处理器(其默认的执行器为SimpleAsyncTaskExecutor)
 		1. 调度：
 			1. 通过在配置类中添加@EnableScheduling注解来开启对调度任务的支持
+				1. 调度方法的编写方式
+					1. 直接编写在配置类中
+			
+							@Configuration
+							 @EnableScheduling
+							 public class AppConfig {
+							
+							     @Scheduled(fixedRate=1000)
+							     public void work() {
+							         // task execution logic
+							     }
+							 }
+					2. 编写在某个类中并在方法通过@Scheduled注解标识,并在配置类中配置改类的Bean
+
+							 public class MyTask {// 定义
+
+							     @Scheduled(fixedRate=1000)
+							     public void work() {
+							         // task execution logic
+							     }
+							 }
+
+							 @Configuration
+							 @EnableScheduling
+							 public class AppConfig {
+							
+							     @Bean
+							     public MyTask task() {// 声明
+							         return new MyTask();
+							     }
+							 }
+					3. 在配置类通过@ComponentScan注解扫描		
+
+							 @Configuration
+							 @EnableScheduling
+							 @ComponentScan(basePackages="com.myco.tasks")
+							 public class AppConfig {
+							 }
 			2. 在执行的bean的方法使用@Scheduled注解来标识该方法为调度的方法
 			3. 如果需要定制执行器则配置类可以实现SchedulingConfigurer接口来自定义
 		4. 条件注解：通过使用@Conditional注解可以根据满足一个特定条件的时候创建特定的bean
